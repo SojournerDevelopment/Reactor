@@ -106,6 +106,7 @@ namespace Reactor.Networking.Client
                 }
                 catch (Exception ex)
                 {
+                    Stop();
                     throw new Exception("No server found. Could not connect");
                 }
             }
@@ -117,10 +118,13 @@ namespace Reactor.Networking.Client
             try
             {
                 quitThread = true;
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Disconnect(false);
-                socket.Close();
-                socket.Dispose();
+                if (socket != null && socket.Connected)
+                {
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Disconnect(false);
+                    socket.Close();
+                    socket.Dispose();
+                }
             }
             catch (Exception ex)
             {
@@ -263,7 +267,10 @@ namespace Reactor.Networking.Client
             CorePacket p = new CorePacket();
             p.Sender = Id;
             p.Type = CorePacketType.Terminate;
-            socket.Send(p.ToBytes());
+            if (socket.Connected && socket != null)
+            {
+                socket.Send(p.ToBytes());
+            }
         }
 
         public void SendPacket(byte[] data)

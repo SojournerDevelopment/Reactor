@@ -54,10 +54,13 @@ namespace Reactor.Networking.Server
             try
             {
                 quitThread = true;
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Disconnect(false);
-                socket.Close();
-                socket.Dispose();
+                if (socket != null && socket.Connected)
+                {
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Disconnect(false);
+                    socket.Close();
+                    socket.Dispose();
+                } 
             }
             catch(Exception ex)
             {
@@ -111,7 +114,10 @@ namespace Reactor.Networking.Server
             CorePacket p = new CorePacket();
             p.Sender = ReactorServer.Id;
             p.Type = CorePacketType.TerminatedClient;
-            socket.Send(p.ToBytes());
+            if (socket.Connected && socket != null)
+            {
+                socket.Send(p.ToBytes());
+            }
             // Send the termination packet
             Stop();
         }

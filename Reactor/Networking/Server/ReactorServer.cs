@@ -39,6 +39,8 @@ namespace Reactor.Networking.Server
         public static event ClientCrashed ClientCrashedEvent;
         public static event ClientConnectionSecured ClientConnectionSecuredEvent;
         public static event ClientPacketReceived ClientPacketReceivedEvent;
+        
+        private static bool quitServerThread = false;
 
         private ReactorServer() { }
 
@@ -46,6 +48,7 @@ namespace Reactor.Networking.Server
         {
             try
             {
+                quitServerThread = false;
                 Id = Identification.Value();
                 Clients = new Dictionary<string, ReactorVirtualClient>();
 
@@ -66,9 +69,14 @@ namespace Reactor.Networking.Server
         {
             try
             {
-                ServerSocket.Shutdown(SocketShutdown.Both);
-                ServerSocket.Disconnect(false);
-                ServerSocket.Close();
+                quitServerThread = true;
+                if (ServerSocket.IsBound && ServerSocket != null)
+                {
+                    ServerSocket.Shutdown(SocketShutdown.Both);
+                    ServerSocket.Disconnect(false);
+                    ServerSocket.Close();
+                    ServerSocket.Dispose();
+                } 
             }
             catch (Exception ex)
             {
@@ -76,8 +84,6 @@ namespace Reactor.Networking.Server
             }
             finally
             {
-                ServerSocket.Dispose();
-                ServerSocketThread.Abort();
                 ServerSocket = null;
                 ServerSocketThread = null;
             }
@@ -108,7 +114,7 @@ namespace Reactor.Networking.Server
 
         public static void HandleListen()
         {
-            while (ServerSocket.IsBound)
+            while (ServerSocket.IsBound && !quitServerThread)
             {
                 ServerSocket.Listen(20);
                 ReactorVirtualClient client = new ReactorVirtualClient();
