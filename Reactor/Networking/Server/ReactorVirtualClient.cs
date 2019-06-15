@@ -46,7 +46,10 @@ namespace Reactor.Networking.Server
             this.socketThread = new Thread(ReactorServer.HandleData);
             this.socketThread.Start(this);
             this.Address = (socket.RemoteEndPoint as IPEndPoint).Address.ToString();
-            SendAuthI();
+            if(ReactorServer.TransmissionType == TransmissionType.Serialized)
+                SendAuthI();
+            else
+                SendJsonAuthI();
         }
 
         public void Stop()
@@ -87,6 +90,18 @@ namespace Reactor.Networking.Server
             socket.Send(p.ToBytes());
         }
 
+        public void SendJsonAuthI()
+        {
+            JsonPacket p = new JsonPacket();
+            p.Type = "AuthOne";
+            p.Sender = ReactorServer.Id;
+            p.Data.Add("client_id",Id);
+            p.Data.Add("server_hwid",ReactorServer.Id);
+            p.Data.Add("server_pk",Convert.ToBase64String(ServerEncryption.PublicKey));
+            p.Data.Add("server_iv", Convert.ToBase64String(ServerEncryption.IV));
+            socket.Send(p.ToByte());
+        }
+
         public void SendAuthIII()
         {
             this.Key = Encoding.Unicode.GetBytes(DataGenerator.Generate(32));
@@ -99,6 +114,18 @@ namespace Reactor.Networking.Server
             socket.Send(p.ToBytes());
         }
 
+        public void SendJsonAuthIII()
+        {
+            this.Key = Encoding.Unicode.GetBytes(DataGenerator.Generate(32));
+            this.Salt = Encoding.Unicode.GetBytes(DataGenerator.Generate(16));
+            JsonPacket p = new JsonPacket();
+            p.Type = "AuthThree";
+            p.Sender = ReactorServer.Id;
+            p.Data.Add("key",Convert.ToBase64String(ServerEncryption.Encrypt(ClientPk,this.Key)));
+            p.Data.Add("salt",Convert.ToBase64String(ServerEncryption.Encrypt(ClientPk,this.Salt)));
+            socket.Send(p.ToByte());
+        }
+
         public void SendPacket(byte[] data)
         {
             CorePacket p = new CorePacket();
@@ -108,17 +135,35 @@ namespace Reactor.Networking.Server
             socket.Send(p.ToBytes());
         }
 
+        public void SendJsonPacket(byte[] data)
+        {
+            JsonPacket p = new JsonPacket();
+            p.Sender = ReactorServer.Id;
+            p.Type = "DataPacket";
+            p.Data.Add("carrier",Convert.ToBase64String(Encryption.AES_Encrypt(data,Key,Salt)));
+        }
+
 
         public void SendTerminatedClient()
         {
             CorePacket p = new CorePacket();
             p.Sender = ReactorServer.Id;
             p.Type = CorePacketType.TerminatedClient;
-            if (socket.Connected && socket != null)
+            if (socket != null && socket.Connected)
             {
                 socket.Send(p.ToBytes());
             }
             // Send the termination packet
+            Stop();
+        }
+
+        public void SendJsonTerminatedClient()
+        {
+            JsonPacket p = new JsonPacket();
+            p.Sender = ReactorServer.Id;
+            p.Type = "Terminate";
+            if (socket != null && socket.Connected)
+                socket.Send(p.ToByte());
             Stop();
         }
 

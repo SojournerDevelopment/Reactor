@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleServer", "SimpleServe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClient", "SimpleClient\SimpleClient.csproj", "{00E8822B-58F6-4851-9E2A-E7C7B6D6CB18}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJsonClient", "SimpleJsonClient\SimpleJsonClient.csproj", "{05C8F4C9-4E51-4B4B-91A0-F036F396DAFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleJsonServer", "SimpleJsonServer\SimpleJsonServer.csproj", "{08E3D140-7C16-4D06-9EC4-B1761DA094FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{00E8822B-58F6-4851-9E2A-E7C7B6D6CB18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00E8822B-58F6-4851-9E2A-E7C7B6D6CB18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00E8822B-58F6-4851-9E2A-E7C7B6D6CB18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05C8F4C9-4E51-4B4B-91A0-F036F396DAFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C8F4C9-4E51-4B4B-91A0-F036F396DAFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05C8F4C9-4E51-4B4B-91A0-F036F396DAFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05C8F4C9-4E51-4B4B-91A0-F036F396DAFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E3D140-7C16-4D06-9EC4-B1761DA094FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E3D140-7C16-4D06-9EC4-B1761DA094FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E3D140-7C16-4D06-9EC4-B1761DA094FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E3D140-7C16-4D06-9EC4-B1761DA094FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +48,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7573EF95-A935-4DF7-B5A4-73ADF63899C1} = {DAC83C84-D503-4C88-A31D-0D7DB19E319B}
 		{00E8822B-58F6-4851-9E2A-E7C7B6D6CB18} = {DAC83C84-D503-4C88-A31D-0D7DB19E319B}
+		{05C8F4C9-4E51-4B4B-91A0-F036F396DAFB} = {DAC83C84-D503-4C88-A31D-0D7DB19E319B}
+		{08E3D140-7C16-4D06-9EC4-B1761DA094FD} = {DAC83C84-D503-4C88-A31D-0D7DB19E319B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C1596C97-8EBE-4B8F-AC5A-A7577D16CCA8}

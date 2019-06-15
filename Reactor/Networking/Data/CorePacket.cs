@@ -57,15 +57,16 @@ namespace Reactor.Networking.Data
         /// Serialize to bytes
         /// </summary>
         /// <returns></returns>
-        public byte[] ToBytes()
+        public byte[] ToBytes(bool json = false)
         {
             BinaryFormatter b = new BinaryFormatter();
             MemoryStream ms = new MemoryStream();
 
-            b.Serialize(ms,this);
+            b.Serialize(ms, this);
             byte[] bytes = ms.ToArray();
             ms.Close();
             return bytes;
+
         }
         
         /// <summary>

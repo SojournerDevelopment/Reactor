@@ -31,6 +31,8 @@ namespace Reactor.Networking.Client
     /// </summary>
     public class ReactorClient
     {
+        public TransmissionType TransmissionType = TransmissionType.Serialized;
+ 
         /// <summary>
         /// Id of the client
         /// </summary>
@@ -197,8 +199,17 @@ namespace Reactor.Networking.Client
         public void StopGracefully()
         {
             // sends the terminate
-            SendTerminate();
+            if (TransmissionType == TransmissionType.Serialized)
+            {
+                SendTerminate();
+            }
+            else
+            {
+                SendJsonTerminate();
+            }
+            
         }
+
 
         /// <summary>
         /// Handle incomming data
@@ -218,7 +229,14 @@ namespace Reactor.Networking.Client
 
                     if (readBytes > 0)
                     {
-                        HandlePacket(new CorePacket(buffer));
+                        if (TransmissionType == TransmissionType.Serialized)
+                        {
+                            HandlePacket(new CorePacket(buffer));
+                        }
+                        else
+                        {
+                            HandleJsonPacket(new JsonPacket(buffer));
+                        }
                     }
                 }
             }
@@ -226,6 +244,27 @@ namespace Reactor.Networking.Client
             {
                 CrashedEvent?.Invoke();
                 Stop();
+            }
+        }
+
+        private void HandleJsonPacket(JsonPacket p)
+        {
+            switch (p.Type)
+            {
+                case "AuthOne":
+                    DoJsonAuthI(p);
+                    break;
+                case "AuthThree":
+                    DoJsonAuthIII(p);
+                    break;
+                case "DataPacket":
+                    DoJsonPacket(p);
+                    break;
+                case "Terminate":
+                    DoJsonTerminatedClient(p);
+                    break;
+                default:
+                    throw new BadPacketException("A unknown json packet was received.", p.ToByte());
             }
         }
 
@@ -278,6 +317,15 @@ namespace Reactor.Networking.Client
             SendAuthII();
         }
 
+        protected virtual void DoJsonAuthI(JsonPacket p)
+        {
+            this.Id = p.Data["client_id"];
+            this.IdServer = p.Data["server_hwid"];
+            this.ServerPk = System.Convert.FromBase64String(p.Data["server_pk"]);
+            this.ServerIv = System.Convert.FromBase64String(p.Data["server_iv"]);
+            SendJsonAuthII();
+        }
+
         /// <summary>
         /// Receive authentication packet III. Connection is now secured.
         /// </summary>
@@ -289,6 +337,13 @@ namespace Reactor.Networking.Client
             SecuredEvent?.Invoke();
         }
 
+        protected virtual void DoJsonAuthIII(JsonPacket p)
+        {
+            this.Key = ClientEncryption.Decrypt(ServerPk, Convert.FromBase64String(p.Data["key"]), ServerIv);
+            this.Salt = ClientEncryption.Decrypt(ServerPk, Convert.FromBase64String(p.Data["salt"]), ServerIv);
+            SecuredEvent?.Invoke();
+        }
+
         /// <summary>
         /// Receive an packet (decrypted symmetrical)
         /// </summary>
@@ -296,6 +351,12 @@ namespace Reactor.Networking.Client
         protected virtual void DoPacket(CorePacket p)
         {
             byte[] data = Encryption.AES_Decrypt(p.Data[0], Key, Salt);
+            PacketReceivedEvent?.Invoke(data);
+        }
+
+        protected virtual void DoJsonPacket(JsonPacket p)
+        {
+            byte[] data = Encryption.AES_Decrypt(Convert.FromBase64String(p.Data["carrier"]), Key, Salt);
             PacketReceivedEvent?.Invoke(data);
         }
 
@@ -336,6 +397,12 @@ namespace Reactor.Networking.Client
             Stop();
         }
 
+        protected virtual void DoJsonTerminatedClient(JsonPacket p)
+        {
+            DisconnectedEvent?.Invoke();
+            Stop();
+        }
+
         #endregion
 
 
@@ -353,6 +420,17 @@ namespace Reactor.Networking.Client
             p.Data.Add(ClientEncryption.IV);
             socket.Send(p.ToBytes());
         }
+
+        protected void SendJsonAuthII()
+        {
+            JsonPacket p = new JsonPacket();
+            p.Sender = this.Id;
+            p.Type = "AuthTwo";
+            p.Data.Add("client_pk",Convert.ToBase64String(ClientEncryption.PublicKey));
+            p.Data.Add("client_iv",Convert.ToBase64String(ClientEncryption.IV));
+            socket.Send(p.ToByte());
+        }
+    
     
         /// <summary>
         /// Send terminate
@@ -369,6 +447,16 @@ namespace Reactor.Networking.Client
             }
         }
 
+        private void SendJsonTerminate()
+        {
+            TerminatingEvent?.Invoke();
+            JsonPacket p = new JsonPacket();
+            p.Sender = Id;
+            p.Type = "Terminating";
+            if (socket.Connected)
+                socket?.Send(p.ToByte());
+        }
+
         /// <summary>
         /// Send packet with byte data
         /// </summary>
@@ -380,6 +468,19 @@ namespace Reactor.Networking.Client
             p.Type = CorePacketType.Packet;
             p.Data.Add(Encryption.AES_Encrypt(data, Key, Salt));
             socket.Send(p.ToBytes());
+        }
+
+        /// <summary>
+        /// Send the string to byte encoded data bytes encrypted to the server
+        /// </summary>
+        /// <param name="data">Data</param>
+        public void SendJsonPacket(byte[] data)
+        {
+            JsonPacket p = new JsonPacket();
+            p.Sender = Id;
+            p.Type = "DataPacket";
+            p.Data.Add("carrier",Convert.ToBase64String(Encryption.AES_Encrypt(data,Key,Salt)));
+            socket.Send(p.ToByte());
         }
 
         protected void SendPacketResponse()

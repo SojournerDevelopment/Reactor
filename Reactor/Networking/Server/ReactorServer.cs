@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Reactor.Crypto;
 using Reactor.Networking.Data;
 using Reactor.Networking.Exceptions;
@@ -49,6 +52,8 @@ namespace Reactor.Networking.Server
     /// </summary>
     public class ReactorServer
     {
+        public static TransmissionType TransmissionType = TransmissionType.Serialized;
+
         /// <summary>
         /// ID
         /// </summary>
@@ -151,7 +156,10 @@ namespace Reactor.Networking.Server
             foreach (var client in Clients)
             {
                 ClientDisconnectedEvent?.Invoke(client.Value);
-                client.Value.SendTerminatedClient();
+                if (TransmissionType == Data.TransmissionType.Serialized)
+                    client.Value.SendTerminatedClient();
+                else
+                    client.Value.SendJsonTerminatedClient();
             }
             Stop();
         }
@@ -168,7 +176,10 @@ namespace Reactor.Networking.Server
             {
                 Clients.Remove(client.Id);
             }
-            client.SendTerminatedClient();
+            if (TransmissionType == Data.TransmissionType.Serialized)
+                client.SendTerminatedClient();
+            else
+                client.SendJsonTerminatedClient();
         }
 
         #region Thread Handler
@@ -210,8 +221,16 @@ namespace Reactor.Networking.Server
                     if (readBytes > 0)
                     {
                         // Interpret
-                        CorePacket packet = new CorePacket(buffer);
-                        HandlePacket(packet);
+                        if (TransmissionType == TransmissionType.Serialized)
+                        {
+                            CorePacket packet = new CorePacket(buffer);
+                            HandlePacket(packet);
+                        }
+                        else
+                        {
+                            JsonPacket packet = new JsonPacket(buffer);
+                            HandleJsonPacket(packet);
+                        }
                     }
                 }
             }
@@ -266,6 +285,29 @@ namespace Reactor.Networking.Server
             }
         }
 
+        public static void HandleJsonPacket(JsonPacket p)
+        {
+            ReactorVirtualClient client;
+
+            if (Clients.TryGetValue(p.Sender, out client))
+            {
+                switch (p.Type)
+                {
+                    case "AuthTwo":
+                        DoJsonAuthII(p, client);
+                        break;
+                    case "DataPacket":
+                        DoJsonPacket(p, client);
+                        break;
+                    case "Terminating":
+                        DoJsonTerminate(p, client);
+                        break;
+                    default:
+                        throw new BadPacketException("Unknown packet received", p.ToByte());
+                }
+            }
+        }
+
         /// <summary>
         /// Received authentication packet II
         /// </summary>
@@ -279,6 +321,14 @@ namespace Reactor.Networking.Server
             c.SendAuthIII();
         }
 
+        protected static void DoJsonAuthII(JsonPacket p, ReactorVirtualClient c)
+        {
+            c.ClientPk = Convert.FromBase64String(p.Data["client_pk"]);
+            c.ClientIv = Convert.FromBase64String(p.Data["client_iv"]);
+            ClientConnectionSecuredEvent?.Invoke(c);
+            c.SendJsonAuthIII();
+        }
+
         /// <summary>
         /// Received (symmetric encrypted) packet
         /// </summary>
@@ -288,6 +338,11 @@ namespace Reactor.Networking.Server
         {
             // Invoke Packet Received event
             ClientPacketReceivedEvent?.Invoke(c, Encryption.AES_Decrypt(p.Data[0], c.Key, c.Salt));
+        }
+
+        protected static void DoJsonPacket(JsonPacket p, ReactorVirtualClient c)
+        {
+            ClientPacketReceivedEvent?.Invoke(c, Encryption.AES_Decrypt(Convert.FromBase64String(p.Data["carrier"]),c.Key,c.Salt));
         }
 
         protected static void DoPacketTest(CorePacket p, ReactorVirtualClient c)
@@ -306,6 +361,11 @@ namespace Reactor.Networking.Server
         }
 
         protected static void DoTerminate(CorePacket p, ReactorVirtualClient c)
+        {
+            DisconnectClient(c);
+        }
+
+        protected static void DoJsonTerminate(JsonPacket p, ReactorVirtualClient c)
         {
             DisconnectClient(c);
         }

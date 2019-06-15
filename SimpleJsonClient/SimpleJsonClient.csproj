@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0A3F1B33-B57A-46C9-8A11-C17A51E01595}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Reactor</RootNamespace>
-    <AssemblyName>Reactor</AssemblyName>
+    <ProjectGuid>{05C8F4C9-4E51-4B4B-91A0-F036F396DAFB}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SimpleJsonClient</RootNamespace>
+    <AssemblyName>SimpleJsonClient</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,13 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,22 +43,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Crypto\Encryption.cs" />
-    <Compile Include="Crypto\Identification.cs" />
-    <Compile Include="Networking\Client\ReactorClient.cs" />
-    <Compile Include="Networking\Data\CorePacket.cs" />
-    <Compile Include="Networking\Data\CorePacketType.cs" />
-    <Compile Include="Networking\Data\JsonPacket.cs" />
-    <Compile Include="Networking\Data\TransmissionType.cs" />
-    <Compile Include="Networking\Exceptions\BadPacketException.cs" />
-    <Compile Include="Networking\Server\ReactorServer.cs" />
-    <Compile Include="Networking\Server\ReactorVirtualClient.cs" />
+    <Compile Include="JsonClient.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\DataGenerator.cs" />
-    <Compile Include="Util\IPTool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Reactor\Reactor.csproj">
+      <Project>{0a3f1b33-b57a-46c9-8a11-c17a51e01595}</Project>
+      <Name>Reactor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
