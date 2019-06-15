@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Reactor.Networking.Data
 {
+
+    /// <summary>
+    /// CorePacket Authentication Types
+    /// </summary>
     public enum CorePacketType
     {
         // -------------------------

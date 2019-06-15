@@ -8,13 +8,22 @@ using System.Threading.Tasks;
 
 namespace Reactor.Crypto
 {
+
+    /// <summary>
+    /// Encryption helper class. Used to provide functionality for
+    /// secure key exchange and encryption.
+    /// </summary>
     public class Encryption : IDisposable
     {
+
         private Aes aes = null;
         private ECDiffieHellmanCng diffieHellman = null;
 
         private readonly byte[] publicKey;
 
+        /// <summary>
+        /// Constructor for a new encryption provider
+        /// </summary>
         public Encryption()
         {
             this.aes = new AesCryptoServiceProvider();
@@ -28,16 +37,28 @@ namespace Reactor.Crypto
             this.publicKey = this.diffieHellman.PublicKey.ToByteArray();
         }
 
+        /// <summary>
+        /// Public key getter
+        /// </summary>
         public byte[] PublicKey
         {
             get { return this.publicKey; }
         }
 
+        /// <summary>
+        /// Initialization vector getter
+        /// </summary>
         public byte[] IV
         {
             get { return this.aes.IV; }
         }
 
+        /// <summary>
+        /// Encrypt byte with the public key
+        /// </summary>
+        /// <param name="publicKey">PK</param>
+        /// <param name="toEncrypt">Bytes to encrypt</param>
+        /// <returns></returns>
         public byte[] Encrypt(byte[] publicKey, byte[] toEncrypt)
         {
             byte[] encryptedMessage;
@@ -63,6 +84,13 @@ namespace Reactor.Crypto
             return encryptedMessage;
         }
 
+        /// <summary>
+        /// Decrypt using the derived encryption key
+        /// </summary>
+        /// <param name="publicKey">PK</param>
+        /// <param name="encryptedMessage">Data</param>
+        /// <param name="iv">IV</param>
+        /// <returns>Decrypted bytes</returns>
         public byte[] Decrypt(byte[] publicKey, byte[] encryptedMessage, byte[] iv)
         {
             byte[] decryptedMessage;
@@ -90,12 +118,20 @@ namespace Reactor.Crypto
 
 
         #region IDisposable Members
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Disposable Member
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -112,13 +148,16 @@ namespace Reactor.Crypto
 
         #region AES Encryption
 
+        /// <summary>
+        /// Encrypt data using AES256
+        /// </summary>
+        /// <param name="bytesToBeEncrypted">Data</param>
+        /// <param name="passwordBytes">Key</param>
+        /// <param name="saltBytes">Salt</param>
+        /// <returns>Encrypted bytes</returns>
         public static byte[] AES_Encrypt(byte[] bytesToBeEncrypted, byte[] passwordBytes, byte[] saltBytes)
         {
             byte[] encryptedBytes = null;
-
-            // Set your salt here, change it to meet your flavor:
-            // The salt bytes must be at least 8 bytes.
-            //byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -145,13 +184,16 @@ namespace Reactor.Crypto
             return encryptedBytes;
         }
 
+        /// <summary>
+        /// Decrypt using AES256
+        /// </summary>
+        /// <param name="bytesToBeDecrypted">Data</param>
+        /// <param name="passwordBytes">Key</param>
+        /// <param name="saltBytes">Salt</param>
+        /// <returns>Decrypted bytes</returns>
         public static byte[] AES_Decrypt(byte[] bytesToBeDecrypted, byte[] passwordBytes, byte[] saltBytes)
         {
             byte[] decryptedBytes = null;
-
-            // Set your salt here, change it to meet your flavor:
-            // The salt bytes must be at least 8 bytes.
-            //byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
             using (MemoryStream ms = new MemoryStream())
             {

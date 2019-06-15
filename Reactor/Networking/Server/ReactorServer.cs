@@ -12,26 +12,71 @@ using Reactor.Networking.Exceptions;
 
 namespace Reactor.Networking.Server
 {
+    
+    /// <summary>
+    /// Client connected to the server
+    /// </summary>
+    /// <param name="c">client</param>
     public delegate void ClientConnected(ReactorVirtualClient c);
 
+    /// <summary>
+    /// Client disconnected
+    /// </summary>
+    /// <param name="c">client</param>
     public delegate void ClientDisconnected(ReactorVirtualClient c);
 
+    /// <summary>
+    /// Client crashed
+    /// </summary>
+    /// <param name="c">client</param>
     public delegate void ClientCrashed(ReactorVirtualClient c);
 
+    /// <summary>
+    /// Client now secured
+    /// </summary>
+    /// <param name="c">client</param>
     public delegate void ClientConnectionSecured(ReactorVirtualClient c);
 
+    /// <summary>
+    /// Client sent packet
+    /// </summary>
+    /// <param name="c">client</param>
+    /// <param name="data">data</param>
     public delegate void ClientPacketReceived(ReactorVirtualClient c,byte[] data);
 
-
+    /// <summary>
+    /// Reactor Server implementation
+    /// </summary>
     public class ReactorServer
     {
+        /// <summary>
+        /// ID
+        /// </summary>
         public static string Id { get; set; }
+
+        /// <summary>
+        /// Network IP Address
+        /// </summary>
         public static string Address { get; set; }
+
+        /// <summary>
+        /// Port
+        /// </summary>
         public static int Port { get; set; }
 
+        /// <summary>
+        /// Dictionary - All clients
+        /// </summary>
         protected static Dictionary<string, ReactorVirtualClient> Clients;
 
+        /// <summary>
+        /// Server Socket
+        /// </summary>
         protected static Socket ServerSocket { get; set; }
+
+        /// <summary>
+        /// Server socket thread
+        /// </summary>
         protected static Thread ServerSocketThread { get; set; }
 
         public static event ClientConnected ClientConnectedEvent;
@@ -44,6 +89,11 @@ namespace Reactor.Networking.Server
 
         private ReactorServer() { }
 
+        /// <summary>
+        /// Start the server
+        /// </summary>
+        /// <param name="address">address</param>
+        /// <param name="port">port</param>
         public static void Start(string address, int port)
         {
             try
@@ -65,6 +115,9 @@ namespace Reactor.Networking.Server
             }
         }
 
+        /// <summary>
+        /// Stop the server
+        /// </summary>
         public static void Stop()
         {
             try
@@ -89,6 +142,10 @@ namespace Reactor.Networking.Server
             }
         }
 
+        /// <summary>
+        /// Stop the server gracefully and inform all
+        /// clients.
+        /// </summary>
         public static void StopGracefully()
         {
             foreach (var client in Clients)
@@ -99,6 +156,10 @@ namespace Reactor.Networking.Server
             Stop();
         }
 
+        /// <summary>
+        /// Client wants disconnect
+        /// </summary>
+        /// <param name="client">client</param>
         public static void DisconnectClient(ReactorVirtualClient client)
         {
             // Send disconnect
@@ -112,6 +173,9 @@ namespace Reactor.Networking.Server
 
         #region Thread Handler
 
+        /// <summary>
+        /// Listener handler
+        /// </summary>
         public static void HandleListen()
         {
             while (ServerSocket.IsBound && !quitServerThread)
@@ -124,6 +188,10 @@ namespace Reactor.Networking.Server
             }
         }
 
+        /// <summary>
+        /// Handle data
+        /// </summary>
+        /// <param name="vc"></param>
         public static void HandleData(object vc)
         {
             ReactorVirtualClient client = (ReactorVirtualClient) vc;
@@ -141,7 +209,7 @@ namespace Reactor.Networking.Server
 
                     if (readBytes > 0)
                     {
-                        // Perform the interpretion
+                        // Interpret
                         CorePacket packet = new CorePacket(buffer);
                         HandlePacket(packet);
                     }
@@ -162,6 +230,10 @@ namespace Reactor.Networking.Server
 
         #region Implemented Methods
 
+        /// <summary>
+        /// Handle new Packet received
+        /// </summary>
+        /// <param name="p"></param>
         public static void HandlePacket(CorePacket p)
         {
             ReactorVirtualClient client;
@@ -194,7 +266,11 @@ namespace Reactor.Networking.Server
             }
         }
 
-
+        /// <summary>
+        /// Received authentication packet II
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="c"></param>
         protected static void DoAuthII(CorePacket p,ReactorVirtualClient c)
         {
             c.ClientPk = p.Data[0];
@@ -203,11 +279,17 @@ namespace Reactor.Networking.Server
             c.SendAuthIII();
         }
 
+        /// <summary>
+        /// Received (symmetric encrypted) packet
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="c"></param>
         protected static void DoPacket(CorePacket p, ReactorVirtualClient c)
         {
             // Invoke Packet Received event
             ClientPacketReceivedEvent?.Invoke(c, Encryption.AES_Decrypt(p.Data[0], c.Key, c.Salt));
         }
+
         protected static void DoPacketTest(CorePacket p, ReactorVirtualClient c)
         {
             // ...?!

@@ -26,23 +26,64 @@ namespace Reactor.Networking.Client
 
     public delegate void PacketReceived(byte[] data);
 
-
+    /// <summary>
+    /// ReactorClient class
+    /// </summary>
     public class ReactorClient
     {
+        /// <summary>
+        /// Id of the client
+        /// </summary>
         public string Id { get; set; }
+
+        /// <summary>
+        /// Id of the server
+        /// </summary>
         public string IdServer { get; set; }
 
+        /// <summary>
+        /// Server IV
+        /// </summary>
         protected byte[] ServerIv { get; set; }
+
+        /// <summary>
+        /// Server PK
+        /// </summary>
         protected byte[] ServerPk { get; set; }
+
+        /// <summary>
+        /// Encryption class instance
+        /// </summary>
         protected Encryption ClientEncryption { get; set; }
 
+        /// <summary>
+        /// Key (symmetric)
+        /// </summary>
         protected byte[] Key { get; set; }
+
+        /// <summary>
+        /// Salt (symmetric)
+        /// </summary>
         protected byte[] Salt { get; set; }
 
+        /// <summary>
+        /// Socket
+        /// </summary>
         protected Socket socket = null;
+
+        /// <summary>
+        /// Socket-Thread
+        /// </summary>
         protected Thread socketThread = null;
 
+        /// <summary>
+        /// IP-Address of the connection
+        /// </summary>
         protected IPAddress address;
+
+        /// <summary>
+        /// Port connected to
+        /// </summary>
         protected int port;
 
         public event Connected ConnectedEvent;
@@ -53,11 +94,15 @@ namespace Reactor.Networking.Client
         public event PacketReceived PacketReceivedEvent;
 
         public bool quitThread = false;
-
+        
 
         public ReactorClient() { }
 
-
+        /// <summary>
+        /// Connect to the desired IP over PORT
+        /// </summary>
+        /// <param name="ip">Internet Protocol Address</param>
+        /// <param name="port">Port</param>
         public void Start(IPAddress ip, int port)
         {
             quitThread = false;
@@ -88,6 +133,9 @@ namespace Reactor.Networking.Client
 
         }
 
+        /// <summary>
+        /// Reconnect the client
+        /// </summary>
         public void Reconnect()
         {
             if (socket == null && socketThread == null)
@@ -112,6 +160,9 @@ namespace Reactor.Networking.Client
             }
         }
 
+        /// <summary>
+        /// Stop the client
+        /// </summary>
         public void Stop()
         {
             // closes the connection and the socket + dispose + stop thread and dispose
@@ -139,12 +190,19 @@ namespace Reactor.Networking.Client
 
         }
 
+        /// <summary>
+        /// Stop gracefully by sending Terminate message. Use this to shut down the
+        /// client.
+        /// </summary>
         public void StopGracefully()
         {
             // sends the terminate
             SendTerminate();
         }
 
+        /// <summary>
+        /// Handle incomming data
+        /// </summary>
         public void HandleData()
         {
             try
@@ -171,6 +229,10 @@ namespace Reactor.Networking.Client
             }
         }
 
+        /// <summary>
+        /// Packet handler wrapper
+        /// </summary>
+        /// <param name="p"></param>
         public void HandlePacket(CorePacket p)
         {
             switch (p.Type)
@@ -203,6 +265,10 @@ namespace Reactor.Networking.Client
 
         #region Implemented Handlers
 
+        /// <summary>
+        /// Receive authentication packet I
+        /// </summary>
+        /// <param name="p">Packet</param>
         protected virtual void DoPacketAuthI(CorePacket p)
         {
             this.Id = Encoding.Unicode.GetString(p.Data[0]);
@@ -212,6 +278,10 @@ namespace Reactor.Networking.Client
             SendAuthII();
         }
 
+        /// <summary>
+        /// Receive authentication packet III. Connection is now secured.
+        /// </summary>
+        /// <param name="p">Packet</param>
         protected virtual void DoPacketAuthIII(CorePacket p)
         {
             this.Key = ClientEncryption.Decrypt(ServerPk, p.Data[0], ServerIv);
@@ -219,27 +289,47 @@ namespace Reactor.Networking.Client
             SecuredEvent?.Invoke();
         }
 
+        /// <summary>
+        /// Receive an packet (decrypted symmetrical)
+        /// </summary>
+        /// <param name="p"></param>
         protected virtual void DoPacket(CorePacket p)
         {
             byte[] data = Encryption.AES_Decrypt(p.Data[0], Key, Salt);
             PacketReceivedEvent?.Invoke(data);
         }
 
+        /// <summary>
+        /// Received a test packet
+        /// </summary>
+        /// <param name="p"></param>
         protected virtual void DoPacketTest(CorePacket p)
         {
             // TODO: ...?!
         }
 
+        /// <summary>
+        /// Received a response packet
+        /// </summary>
+        /// <param name="p"></param>
         protected virtual void DoPacketResponse(CorePacket p)
         {
             // TODO: ...?!
         }
 
+        /// <summary>
+        /// Received a ping packet
+        /// </summary>
+        /// <param name="p"></param>
         protected virtual void DoPing(CorePacket p)
         {
             // TODO: ...?!
         }
 
+        /// <summary>
+        /// Terminated client
+        /// </summary>
+        /// <param name="p"></param>
         protected virtual void DoTerminatedClient(CorePacket p)
         {
             DisconnectedEvent?.Invoke();
@@ -251,6 +341,9 @@ namespace Reactor.Networking.Client
 
         #region Send Methods
 
+        /// <summary>
+        /// Send authentication packet II
+        /// </summary>
         protected void SendAuthII()
         {
             CorePacket p = new CorePacket();
@@ -261,6 +354,9 @@ namespace Reactor.Networking.Client
             socket.Send(p.ToBytes());
         }
     
+        /// <summary>
+        /// Send terminate
+        /// </summary>
         protected void SendTerminate()
         {
             TerminatingEvent?.Invoke();
@@ -273,6 +369,10 @@ namespace Reactor.Networking.Client
             }
         }
 
+        /// <summary>
+        /// Send packet with byte data
+        /// </summary>
+        /// <param name="data"></param>
         public void SendPacket(byte[] data)
         {
             CorePacket p = new CorePacket();

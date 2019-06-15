@@ -7,9 +7,14 @@ using System.Threading.Tasks;
 
 namespace Reactor.Crypto
 {
+
+    /// <summary>
+    /// Hardware Identification Module
+    /// </summary>
     public class Identification
     {
         private static string fingerPrint = string.Empty;
+
         public static string Value()
         {
             if (string.IsNullOrEmpty(fingerPrint))
@@ -21,6 +26,7 @@ namespace Reactor.Crypto
             }
             return fingerPrint;
         }
+
         private static string GetHash(string s)
         {
             MD5 sec = new MD5CryptoServiceProvider();
@@ -28,6 +34,7 @@ namespace Reactor.Crypto
             byte[] bt = enc.GetBytes(s);
             return GetHexString(sec.ComputeHash(bt));
         }
+
         private static string GetHexString(byte[] bt)
         {
             string s = string.Empty;
@@ -50,6 +57,7 @@ namespace Reactor.Crypto
             }
             return s;
         }
+
         #region Original Device ID Getting Code
         //Return a hardware identifier
         private static string identifier

@@ -12,9 +12,9 @@ using Reactor.Util;
 
 namespace Reactor.Networking.Server
 {
-    // STATIC EVENT WHICH IS CALLED WHEN A CLIENT IS RISING AN EXCEPTION AND DISCONNECTS
-
-
+    /// <summary>
+    /// Virtual client - (server side)
+    /// </summary>
     public class ReactorVirtualClient
     {
         public string Id { get; set; }
