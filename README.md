@@ -1,4 +1,6 @@
-# Reactor
+![](https://raw.githubusercontent.com/SojournerDevelopment/Reactor/master/Doc/reactor.svg?sanitize=true)
+
+### Secure Server/Client Framework
 
 Reactor is a framework designed to enable the development of server and client applications that rely on reliability, performance and security.
 
