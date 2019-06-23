@@ -137,3 +137,59 @@ The next step will teach you how to create a custom client, that is directly wor
 
 #### Reactor Client
 
+The client is even easier to create. 
+
+```csharp
+/// <summary>
+    /// ReactorSecureClient
+    ///
+    /// A reactor client must include the following
+    /// handler functionality:
+    /// 
+    ///     The handle packet, must comply and accept the registration packet,
+    ///     the server automatically sends to the clients.
+    ///
+    ///     The disconnect packet from the server must be accepted. 
+    /// 
+    /// </summary>
+    public class ReactorSecureClient : Core.ReactorClient
+    {
+
+        public ReactorSecureClient() : base()
+        {
+            
+        }
+        
+        public override void HandlePacket(byte[] data)
+        {
+            // Handle the data, the client received
+        }
+
+        public override void SendRequestDisconnect()
+        {
+            // Send the request to tell the serve
+            // the client wants to close the connection
+        }
+
+        protected override void Connected()
+        {
+            // The client is connected to the server
+        }
+
+        protected override void Disconnected()
+        {
+            // Client connection is disconnected
+        }
+    }
+```
+
+To receive the message, the server sent as registration, you could simply implement the following code in the HandlePacket method.
+
+```csharp
+public override void HandlePacket(byte[] data)
+{
+    // Handle the data, the client received
+    string packet = Encoding.Unicode.GetString(data);
+    // ...
+}
+```

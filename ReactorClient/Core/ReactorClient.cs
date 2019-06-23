@@ -91,6 +91,7 @@ namespace ReactorClient.Core
             }
             catch (Exception ex)
             {
+                Disconnected();
                 DisconnectedEvent?.Invoke();
                 throw new Exception("No server found. Could not connect");
             }
@@ -171,6 +172,7 @@ namespace ReactorClient.Core
             try
             {
                 ConnectedEvent?.Invoke();
+                Connected();
                 byte[] buffer;
                 int readBytes;
 
@@ -207,12 +209,11 @@ namespace ReactorClient.Core
         /// <summary>
         /// Send the request disconnect packet (alias: RequestMelt)
         /// </summary>
-        public virtual void SendRequestDisconnect()
-        {
+        public virtual void SendRequestDisconnect() { }
 
-        }
+        protected virtual void Connected() { }
 
-
+        protected virtual void Disconnected() { }
 
     }
 

@@ -28,13 +28,23 @@ namespace ReactorClient.Secure
         
         public override void HandlePacket(byte[] data)
         {
-            // Ignore
+            // Handle the data, the client received
         }
 
         public override void SendRequestDisconnect()
         {
-            // base.SendRequestDisconnect();
+            // Send the request to tell the serve
+            // the client wants to close the connection
         }
 
+        protected override void Connected()
+        {
+            // The client is connected to the server
+        }
+
+        protected override void Disconnected()
+        {
+            // Client connection is disconnected
+        }
     }
 }
