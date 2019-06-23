@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactorClient", "ReactorCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactorSecureClientExample", "ReactorSecureClientExample\ReactorSecureClientExample.csproj", "{70CC9ACE-A374-443E-8F89-E7A38CE1A08A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6DDAD638-EFBE-44D4-905F-5904BC4A5C50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactorTests", "ReactorTests\ReactorTests.csproj", "{E69CC91E-51CD-4FD1-B94D-6473ABF7F44D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +57,10 @@ Global
 		{70CC9ACE-A374-443E-8F89-E7A38CE1A08A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70CC9ACE-A374-443E-8F89-E7A38CE1A08A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70CC9ACE-A374-443E-8F89-E7A38CE1A08A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E69CC91E-51CD-4FD1-B94D-6473ABF7F44D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E69CC91E-51CD-4FD1-B94D-6473ABF7F44D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E69CC91E-51CD-4FD1-B94D-6473ABF7F44D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E69CC91E-51CD-4FD1-B94D-6473ABF7F44D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +70,7 @@ Global
 		{00E8822B-58F6-4851-9E2A-E7C7B6D6CB18} = {DAC83C84-D503-4C88-A31D-0D7DB19E319B}
 		{4A51BBC7-5DCB-4000-8171-234B9525F834} = {DAC83C84-D503-4C88-A31D-0D7DB19E319B}
 		{70CC9ACE-A374-443E-8F89-E7A38CE1A08A} = {DAC83C84-D503-4C88-A31D-0D7DB19E319B}
+		{E69CC91E-51CD-4FD1-B94D-6473ABF7F44D} = {6DDAD638-EFBE-44D4-905F-5904BC4A5C50}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C1596C97-8EBE-4B8F-AC5A-A7577D16CCA8}
