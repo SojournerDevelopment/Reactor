@@ -184,6 +184,13 @@ namespace ReactorServer.Core
             throw new NotImplementedException();
         }
 
+        public void RemoveClient(ReactorVirtualClient client)
+        {
+            lock (Clients)
+            {
+                Clients.Remove(client.Id);
+            }
+        }
 
     }
 }

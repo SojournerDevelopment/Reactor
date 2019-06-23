@@ -35,7 +35,12 @@ namespace ReactorServer.Core
 
         public bool QuitThread = false;
 
-        public ReactorVirtualClient() { }
+        protected ReactorServer Server;
+
+        public ReactorVirtualClient(ReactorServer server)
+        {
+            this.Server = server;
+        }
 
         public ClientCrashed ClientCrashedEvent;
         public ClientPacketReceived ClientPacketReceivedEvent;
@@ -103,15 +108,18 @@ namespace ReactorServer.Core
                 {
                     buffer = new byte[clientSocket.SendBufferSize];
                     readBytes = clientSocket.Receive(buffer);
+                    byte[] packet = new byte[readBytes];
+                    Array.Copy(buffer, packet, readBytes);
 
                     if (readBytes > 0)
                     {
-                        HandlePacket(buffer,client);
+                        HandlePacket(packet,client);
                     }
                 }
             }
             catch (Exception ex)
             {
+                client.Server.RemoveClient(client);
                 client.ClientCrashed();
                 client.ClientCrashedEvent?.Invoke(client);
                 client.Stop();

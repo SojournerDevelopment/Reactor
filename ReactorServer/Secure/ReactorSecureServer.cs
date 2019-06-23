@@ -23,11 +23,11 @@ namespace ReactorServer.Secure
         }
         
 
-        public ReactorSecureServer() { }
+        public ReactorSecureServer() : base() { }
 
         protected override ReactorVirtualClient AcceptVirtualClient()
         {
-            return new ReactorSecureVirtualClient();
+            return new ReactorSecureVirtualClient(this);
         }
 
         #region Overrides

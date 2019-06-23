@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ReactorServer.Core;
@@ -10,7 +11,7 @@ namespace ReactorServer.Secure
     public class ReactorSecureVirtualClient : ReactorVirtualClient
     {
 
-        public ReactorSecureVirtualClient() { }
+        public ReactorSecureVirtualClient(Core.ReactorServer server) : base(server) {}
 
         #region Overrides
 
@@ -36,6 +37,7 @@ namespace ReactorServer.Secure
             string packet = " {\r\n  \"reactor\": {\r\n    \"type\": \"REG\",\r\n    \"sender\": \"SENDER-ID\",\r\n    \"receiver\": \"RECEIVER-ID\",\r\n    \"key\": \"RSA PUBLIC KEY BASE 64\" \r\n  }\r\n} ";
             byte[] byte_packet = Encoding.Unicode.GetBytes(packet);
             SendPacket(byte_packet);
+            Console.WriteLine("SENT: "+packet);
         }
 
         public override void SendDisconnect()
