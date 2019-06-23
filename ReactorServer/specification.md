@@ -1,5 +1,7 @@
 # Packet Specification
 
+The following specifications apply to the reactor framework SecureServer and SecureClient.
+
 ### Registration
 
 Sender: **Server**
