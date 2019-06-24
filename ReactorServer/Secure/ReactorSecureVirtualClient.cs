@@ -13,29 +13,53 @@ using ReactorServer.Utils.Pem;
 
 namespace ReactorServer.Secure
 {
+    /// <summary>
+    /// ReactorSecure Virtual Client class
+    /// </summary>
     public class ReactorSecureVirtualClient : ReactorVirtualClient
     {
-
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="server">ReactorServer</param>
         public ReactorSecureVirtualClient(Core.ReactorServer server) : base(server) {}
 
+        /// <summary>
+        /// Symmetric Session Key
+        /// </summary>
         protected byte[] SessionKey { get; set; }
+
+        /// <summary>
+        /// Symmetric Session Salt
+        /// </summary>
         protected byte[] SessionSalt { get; set; }
 
+        /// <summary>
+        /// Fusion Key for the server
+        /// </summary>
         protected string fusionKey { get; set; }
+
+        /// <summary>
+        /// Fusion Key for the client
+        /// </summary>
         protected string fusionKeyClient { get; set; }
 
         #region Overrides
 
-        protected override void ClientCrashed()
-        {
-            // Possible reconnect
-        }
-
+        /// <summary>
+        /// Generate a custom identification for all the
+        /// secure clients
+        /// </summary>
+        /// <returns></returns>
         protected override string GenerateId()
         {
             return Guid.NewGuid().ToString();
         }
 
+        /// <summary>
+        /// Handle the data received by the ReactorServer client socket
+        /// </summary>
+        /// <param name="data"></param>
         protected override void Handle(byte[] data)
         {
             string received = Encoding.Unicode.GetString(data);
@@ -79,6 +103,9 @@ namespace ReactorServer.Secure
             SendPacket(byte_packet);
         }
 
+        /// <summary>
+        /// Send the Disconnect packet
+        /// </summary>
         public override void SendDisconnect()
         {
             SendMelt();
@@ -88,6 +115,10 @@ namespace ReactorServer.Secure
 
         #region HandlePackets
 
+        /// <summary>
+        /// Handle AUTH
+        /// </summary>
+        /// <param name="packet"></param>
         protected void HandleAuth(JsonObject packet)
         {
             var sessionkey = packet.get("reactor").asObject().get("session").asString();
@@ -99,6 +130,10 @@ namespace ReactorServer.Secure
             SendFusion();
         }
 
+        /// <summary>
+        /// Handle MELT
+        /// </summary>
+        /// <param name="packet"></param>
         protected void HandleMelt(JsonObject packet)
         {
             string meltkey = Encoding.Unicode.GetString(AesUtil.AES_Decrypt(
@@ -116,6 +151,9 @@ namespace ReactorServer.Secure
 
         #region SendPackets
 
+        /// <summary>
+        /// Send FUSION packet
+        /// </summary>
         protected void SendFusion()
         {
             // generate fusion keys
@@ -140,6 +178,9 @@ namespace ReactorServer.Secure
             SendPacket(byte_packet); 
         }
 
+        /// <summary>
+        /// Send MELT packet
+        /// </summary>
         protected void SendMelt()
         {
             JsonObject content = new JsonObject();
@@ -158,6 +199,10 @@ namespace ReactorServer.Secure
 
         #region SecureClient Functions
 
+        /// <summary>
+        /// Send a secure packet
+        /// </summary>
+        /// <param name="content"></param>
         protected virtual void SendSecurePacket(byte[] content)
         {
             JsonObject packet = new JsonObject();
@@ -172,6 +217,10 @@ namespace ReactorServer.Secure
             SendPacket(byte_packet);
         }
 
+        /// <summary>
+        /// Handle data received via a secure packet
+        /// </summary>
+        /// <param name="content"></param>
         protected virtual void HandleSecurePacket(byte[] content)
         {
             throw new NotImplementedException();

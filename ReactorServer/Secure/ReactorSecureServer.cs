@@ -9,9 +9,15 @@ using ReactorServer.Utils.Pem;
 
 namespace ReactorServer.Secure
 {
+    /// <summary>
+    /// ReactorSecure Server class
+    /// </summary>
     public class ReactorSecureServer : Core.ReactorServer
     {
-
+        /// <summary>
+        /// A custom Dictionary, extending the clients collection by automatically
+        /// converting all Clients to reactor secure virtual clients. (Example)
+        /// </summary>
         public Dictionary<string, ReactorSecureVirtualClient> ClientDictionary
         {
             get
@@ -25,6 +31,9 @@ namespace ReactorServer.Secure
             }
         }
 
+        /// <summary>
+        /// RSA CryptoProvider
+        /// </summary>
         protected RSACryptoServiceProvider RSACSP = new RSACryptoServiceProvider(2048);
 
         /// <summary>
@@ -43,13 +52,18 @@ namespace ReactorServer.Secure
             get { return Crypto.ExportPrivateKeyToRSAPEM(RSACSP); }
         }
         
-
-
+        /// <summary>
+        /// ReactorSecureServer constructor
+        /// </summary>
         public ReactorSecureServer() : base()
         {
             Id = Guid.NewGuid().ToString();
         }
 
+        /// <summary>
+        /// Creates a new VirtualClient as accept blueprint
+        /// </summary>
+        /// <returns></returns>
         protected override ReactorVirtualClient AcceptVirtualClient()
         {
             return new ReactorSecureVirtualClient(this);
@@ -59,26 +73,38 @@ namespace ReactorServer.Secure
 
         protected override void ClientConnected(ReactorVirtualClient client)
         {
-            // base.ClientConnected(client);
+            // Client connected
         }
 
         protected override void ClientCrashed(ReactorVirtualClient client)
         {
-            // base.ClientCrashed(client);
+            // Client crashed
         }
 
         protected override void ClientDisconnected(ReactorVirtualClient client)
         {
-            // base.ClientDisconnected(client);
+            // Client disconnected
         }
 
         #endregion
 
+        /// <summary>
+        /// This method helps you to encrypt data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="server"></param>
+        /// <returns></returns>
         public static byte[] Encrypt(byte[] data,ReactorSecureServer server)
         {
             return server.RSACSP.Encrypt(data,true);
         }
 
+        /// <summary>
+        /// This method helps to decrypt data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="server"></param>
+        /// <returns></returns>
         public static byte[] Decrypt(byte[] data, ReactorSecureServer server)
         {
             return server.RSACSP.Decrypt(data, true);
