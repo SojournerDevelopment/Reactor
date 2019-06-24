@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ReactorServer.Utils.Aes
 {
+    /// <summary>
+    /// AES Utilities class
+    /// </summary>
     public static class AesUtil
     {
         /// <summary>

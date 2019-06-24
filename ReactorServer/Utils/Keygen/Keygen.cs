@@ -7,8 +7,17 @@ using System.Threading.Tasks;
 
 namespace ReactorServer.Utils.Keygen
 {
+    /// <summary>
+    /// Generator for random data
+    /// </summary>
     public static class Keygen
     {
+
+        /// <summary>
+        /// Generates a random string of data
+        /// </summary>
+        /// <param name="size">Amount of characters in the string</param>
+        /// <returns>random string</returns>
         public static string GetUniqueKey(int size)
         {
             char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
@@ -25,6 +34,11 @@ namespace ReactorServer.Utils.Keygen
             return result.ToString();
         }
 
+        /// <summary>
+        /// Generates a random array of bytes
+        /// </summary>
+        /// <param name="size">size to use as base. This is doubles</param>
+        /// <returns>random byte array</returns>
         public static byte[] GetUniqueBytes(int size)
         {
             char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();

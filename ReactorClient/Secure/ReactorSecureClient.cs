@@ -14,6 +14,9 @@ namespace ReactorClient.Secure
     /// <summary>
     /// ReactorSecureClient
     ///
+    /// This client is ready to use and shows how to use the default implementation
+    /// of ReactorClient.
+    /// 
     /// A reactor client must include the following
     /// handler functionality:
     /// 
@@ -25,19 +28,41 @@ namespace ReactorClient.Secure
     /// </summary>
     public class ReactorSecureClient : Core.ReactorClient
     {
+
+        /// <summary>
+        /// Session Salt - for symmetric encryption
+        /// </summary>
         protected byte[] SessionSalt;
+
+        /// <summary>
+        /// Session Key - for symmetric encryption
+        /// </summary>
         protected byte[] SessionKey;
 
+        /// <summary>
+        /// Key sent to shutdown the connection on the server
+        /// </summary>
         protected string fusionKey { get; set; }
+
+        /// <summary>
+        /// Key sent to shutdown the client
+        /// </summary>
         protected string fusionKeyClient { get; set; }
 
         protected RSACryptoServiceProvider CryptoService;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ReactorSecureClient() : base()
         {
             
         }
         
+        /// <summary>
+        /// Handles the data received. Abstraction layer 1
+        /// </summary>
+        /// <param name="data"></param>
         public override void HandlePacket(byte[] data)
         {
             // Handle the data, the client received
@@ -64,6 +89,10 @@ namespace ReactorClient.Secure
 
         #region Handlers
 
+        /// <summary>
+        /// Handle REG packet 
+        /// </summary>
+        /// <param name="o"></param>
         protected void HandleReg(JsonObject o)
         {
             this.Id = o.get("reactor").asObject().get("receiver").asString();
@@ -73,6 +102,10 @@ namespace ReactorClient.Secure
             SendAuth();
         }
 
+        /// <summary>
+        /// Handle FUSION packet
+        /// </summary>
+        /// <param name="o"></param>
         protected void HandleFusion(JsonObject o)
         {
             var data = o.get("reactor").asObject().get("content").asString();
@@ -83,6 +116,10 @@ namespace ReactorClient.Secure
             ConnectionSecured();
         }
 
+        /// <summary>
+        /// Handle MELT packet
+        /// </summary>
+        /// <param name="o"></param>
         protected void HandleMelt(JsonObject o)
         {
             var data = o.get("reactor").asObject().get("content").asString();
@@ -93,11 +130,19 @@ namespace ReactorClient.Secure
             }
         }
 
+        /// <summary>
+        /// Overwrite this in your deriving class to handle
+        /// all traffic over a secured connection.
+        /// </summary>
+        /// <param name="data"></param>
         protected virtual void HandleSecurePacket(byte[] data)
         {
 
         }
 
+        /// <summary>
+        /// This is called when the connection is secured.
+        /// </summary>
         protected virtual void ConnectionSecured() { }
 
         #endregion
@@ -105,6 +150,9 @@ namespace ReactorClient.Secure
 
         #region Sender
 
+        /// <summary>
+        /// Send the AUTH packet
+        /// </summary>
         protected void SendAuth()
         {
             this.SessionKey = Encoding.Unicode.GetBytes(Keygen.GetUniqueKey(30));
@@ -125,6 +173,9 @@ namespace ReactorClient.Secure
             SendData(byte_packet);
         }
 
+        /// <summary>
+        /// Send the MELT packet
+        /// </summary>
         protected void SendMelt()
         {
             JsonObject content = new JsonObject();
@@ -139,6 +190,13 @@ namespace ReactorClient.Secure
             SendData(byte_packet);
         }
 
+        /// <summary>
+        /// This method sends data and encrypts in in the default DATA format
+        /// used for the ReactorSecureServer
+        ///
+        /// Use this methdo to send data from deriving classes
+        /// </summary>
+        /// <param name="data"></param>
         public void SendSecurePacket(byte[] data)
         {
             JsonObject content = new JsonObject();
@@ -155,6 +213,9 @@ namespace ReactorClient.Secure
 
         #endregion
 
+        /// <summary>
+        /// Send the request to disconnect to the server
+        /// </summary>
         public override void SendRequestDisconnect()
         {
             // Send the request to tell the serve
@@ -162,14 +223,5 @@ namespace ReactorClient.Secure
             SendMelt();
         }
 
-        protected override void Connected()
-        {
-            // The client is connected to the server
-        }
-
-        protected override void Disconnected()
-        {
-            // Client connection is disconnected
-        }
     }
 }

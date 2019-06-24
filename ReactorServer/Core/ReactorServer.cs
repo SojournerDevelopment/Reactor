@@ -54,11 +54,21 @@ namespace ReactorServer.Core
         /// </summary>
         protected Thread ServerSocketThread { get; set; }
 
+        #region Events
+
         public event ClientConnected ClientConnectedEvent;
         public event ClientDisconnected ClientDisconnectedEvent;
 
+        #endregion
+
+        /// <summary>
+        /// Controls the listener thread
+        /// </summary>
         private bool _quitServerThread = false;
 
+        /// <summary>
+        /// Constructor of the server
+        /// </summary>
         protected ReactorServer() { }
 
         /// <summary>
@@ -157,9 +167,7 @@ namespace ReactorServer.Core
                 ClientConnectedEvent?.Invoke(client);
             }
         }
-
-        // TODO: OVERWRITE
-
+        
         /// <summary>
         /// Add custom clients via this method, simple return your own client class
         /// </summary>
@@ -169,21 +177,37 @@ namespace ReactorServer.Core
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Called when a new client connected to the server
+        /// </summary>
+        /// <param name="client"></param>
         protected virtual void ClientConnected(ReactorVirtualClient client)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Called when a client disconnected to the server
+        /// </summary>
+        /// <param name="client"></param>
         protected virtual void ClientDisconnected(ReactorVirtualClient client)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Called when a client has crashed
+        /// </summary>
+        /// <param name="client"></param>
         protected virtual void ClientCrashed(ReactorVirtualClient client)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Removes a client from the client collection, the server has
+        /// </summary>
+        /// <param name="client"></param>
         public void RemoveClient(ReactorVirtualClient client)
         {
             lock (Clients)

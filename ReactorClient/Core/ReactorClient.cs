@@ -9,17 +9,36 @@ using System.Threading.Tasks;
 
 namespace ReactorClient.Core
 {
+    /// <summary>
+    /// Connected event
+    /// </summary>
     public delegate void Connected();
 
+    /// <summary>
+    /// Terminating event
+    /// </summary>
     public delegate void Terminating();
 
+    /// <summary>
+    /// Disconnected event
+    /// </summary>
     public delegate void Disconnected();
 
+    /// <summary>
+    /// Crashed event
+    /// </summary>
     public delegate void Crashed();
 
+    /// <summary>
+    /// Packet received with data
+    /// </summary>
+    /// <param name="data"></param>
     public delegate void PacketReceived(byte[] data);
-
-
+    
+    /// <summary>
+    /// The base class of the reactor client. Use this class to create
+    /// your own clients.
+    /// </summary>
     public abstract class ReactorClient
     {
         /// <summary>
@@ -52,14 +71,24 @@ namespace ReactorClient.Core
         /// </summary>
         protected int Port;
 
+        #region Events
+
         public event Connected ConnectedEvent;
         public event Terminating TerminatingEvent;
         public event Disconnected DisconnectedEvent;
         public event Crashed CrashedEvent;
         public event PacketReceived PacketReceivedEvent;
 
+        #endregion
+
+        /// <summary>
+        /// The thread runs as long as the quit is not activated
+        /// </summary>
         protected bool QuitThread = false;
 
+        /// <summary>
+        /// Parameterless constructor
+        /// </summary>
         protected ReactorClient() { }
 
         /// <summary>
@@ -165,7 +194,7 @@ namespace ReactorClient.Core
         }
 
         /// <summary>
-        /// Handle incomming data
+        /// Handle incomming data. 
         /// </summary>
         public void HandleData()
         {
@@ -257,6 +286,11 @@ namespace ReactorClient.Core
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Sends the data over the socket to the server.
+        /// Use this method in inheriting classes.
+        /// </summary>
+        /// <param name="data"></param>
         public void SendData(byte[] data)
         {
             byte[] sizeinfo = new byte[4];
@@ -276,8 +310,15 @@ namespace ReactorClient.Core
         /// </summary>
         public virtual void SendRequestDisconnect() { }
 
+        /// <summary>
+        /// This method is called when the client is connected
+        /// to the server
+        /// </summary>
         protected virtual void Connected() { }
 
+        /// <summary>
+        /// Called when the client Disconnected from the server.
+        /// </summary>
         protected virtual void Disconnected() { }
 
     }

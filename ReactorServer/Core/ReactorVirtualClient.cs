@@ -23,27 +23,63 @@ namespace ReactorServer.Core
     /// <param name="data">data</param>
     public delegate void ClientPacketReceived(ReactorVirtualClient c, byte[] data);
 
+    /// <summary>
+    /// ReactorVirtualClient - Base class for all virtual clients.
+    /// Hosts the interaction logic for the server with its clients.
+    /// </summary>
     public abstract class ReactorVirtualClient
     {
+        /// <summary>
+        /// Identification assigned to the client (assigned via <see cref="GenerateId"/>)
+        /// </summary>
         public string Id { get; set; }
+
+        /// <summary>
+        /// IP of the Client - Used as text representation
+        /// </summary>
         public string Address { get; set; }
 
+        /// <summary>
+        /// Tag that can be appended to the client
+        /// </summary>
         public object Tag { get; set; }
 
+        /// <summary>
+        /// Socket, the client is using
+        /// </summary>
         public Socket Socket;
+
+        /// <summary>
+        /// Thread the socket listener is using,
+        /// (not very performant for hundreds of clients but very safe)
+        /// </summary>
         public Thread SocketThread;
 
+        /// <summary>
+        /// Controls the listener thread
+        /// </summary>
         public bool QuitThread = false;
 
+        /// <summary>
+        /// ReactorServer the client is running in
+        /// </summary>
         protected ReactorServer Server;
 
+        /// <summary>
+        /// Constructor containing the server
+        /// </summary>
+        /// <param name="server"></param>
         public ReactorVirtualClient(ReactorServer server)
         {
             this.Server = server;
         }
 
+        #region Events
+
         public ClientCrashed ClientCrashedEvent;
         public ClientPacketReceived ClientPacketReceivedEvent;
+
+        #endregion
 
         /// <summary>
         /// Start the client with a socket. This method is called by the
@@ -214,28 +250,47 @@ namespace ReactorServer.Core
 
         #endregion
 
+        /// <summary>
+        /// Returns a new id for the server. When deriving override this
+        /// to asign your own generated ids to the clients.
+        /// </summary>
+        /// <returns></returns>
         protected virtual string GenerateId()
         {
             return Guid.NewGuid().ToString();
         }
 
+        /// <summary>
+        /// Overwrite this to handle the raw data the server received.
+        /// Attention: Framing already done. It is made sure, the server
+        /// receives the full packet, the client send
+        /// </summary>
+        /// <param name="data"></param>
         protected virtual void Handle(byte[] data)
         {
             throw new NotImplementedException();
         }
-
+        
+        /// <summary>
+        /// Client crashed
+        /// </summary>
         protected virtual void ClientCrashed()
         {
             throw new NotImplementedException();
         }
 
-        // TODO: SEND METHODS
-
+        /// <summary>
+        /// Server executes this method right after the connection
+        /// is accepted and the client generated. Welcome logic here.
+        /// </summary>
         public virtual void SendRegistration()
         {
             throw new NotImplementedException();
         }
         
+        /// <summary>
+        /// Send the disconnect request to the server.
+        /// </summary>
         public virtual void SendDisconnect()
         {
             throw new NotImplementedException();
