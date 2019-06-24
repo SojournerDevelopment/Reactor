@@ -10,7 +10,6 @@ All your communication will be encrypted and use the ReactorProtocol (You can re
 
 Reactor can also be used for IPC.
 
-The latest implementation allows TCP Server/Clients to be developed using the JSON Mime Format. For example, a Python script can be used as a client while Reactor runs as a .net server on the other side.
 Reactor *next-gen* Version 1.0 is completely platform independent meaning you can develop a server / client for it in nearly any programming language.
 
 Check out the many different examples included within the repository, starting with a simple console based server, over to a easy to implement Remote Desktop application and more. It has never been easier to create an secure tcp/ip socket server and client.
