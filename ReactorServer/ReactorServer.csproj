@@ -46,6 +46,25 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Secure\ReactorSecureServer.cs" />
     <Compile Include="Secure\ReactorSecureVirtualClient.cs" />
+    <Compile Include="Utils\Json\JsonArray.cs" />
+    <Compile Include="Utils\Json\JsonLiteral.cs" />
+    <Compile Include="Utils\Json\JsonNumber.cs" />
+    <Compile Include="Utils\Json\JsonObject.cs" />
+    <Compile Include="Utils\Json\JsonParser.cs" />
+    <Compile Include="Utils\Json\JsonString.cs" />
+    <Compile Include="Utils\Json\JsonValue.cs" />
+    <Compile Include="Utils\Json\JsonWriter.cs" />
+    <Compile Include="Utils\Json\ParseException.cs" />
+    <Compile Include="Utils\Pem\AsnKeyBuilder.cs" />
+    <Compile Include="Utils\Pem\AsnKeyParser.cs" />
+    <Compile Include="Utils\Pem\BerDecodeError.cs" />
+    <Compile Include="Utils\Pem\BigInteger.cs" />
+    <Compile Include="Utils\Pem\Crypto.cs" />
+    <Compile Include="Utils\Pem\Helpers.cs" />
+    <Compile Include="Utils\Pem\PemKeyUtils.cs" />
+    <Compile Include="Utils\Pem\PemTypes.cs" />
+    <Compile Include="Utils\Pem\RSAParameterTraits.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

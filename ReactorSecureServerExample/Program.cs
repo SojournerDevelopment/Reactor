@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ReactorServer.Core;
 using ReactorServer.Secure;
+using ReactorServer.Utils.Pem;
 
 namespace ReactorSecureServerExample
 {
@@ -21,16 +23,16 @@ namespace ReactorSecureServerExample
 
             while (true)
             {
-                Console.Clear();
+                //Console.Clear();
                 Console.WriteLine("\n------------ CONNECTED CLIENTS -------------");
                 foreach (var x in server.ClientDictionary)
                 {
                     Console.WriteLine("Client: "+x.Key);
                 }
                 Console.WriteLine("\n--------------------------------------------");
-                Thread.Sleep(5000);
+                Thread.Sleep(50000);
             }
-
+            
         }
 
         private static void ServerOnClientDisconnectedEvent(ReactorVirtualClient c)

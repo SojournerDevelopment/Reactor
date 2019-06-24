@@ -31,7 +31,8 @@ The client generates a session-key and encrypts its `base64()` content with the 
     "type": "AUTH",
     "sender": "CLIENT-ID",
     "receiver": "SERVER-ID",
-    "session":"base64(EncryptedKey)"
+    "session": "base64(EncryptedKey)",
+    "salt": "base64(EncryptedSalt)"
   }
 } 
 ```
@@ -48,8 +49,10 @@ If the session key is successfully decrypted, the server sends the fusion packet
     "type": "FUSION",
     "sender": "SERVER-ID",
     "receiver": "CLIENT-ID",
-    "core": "base64(end-key)",
-    "core-fin": "base64(end-key-client)"
+    "content": { // THIS PART SHOULD BE ENCRYPTED /!\
+      "core": "base64(end-key)",
+      "core-fin": "base64(end-key-client)"
+    }
   }
 }
 ```

@@ -206,6 +206,14 @@ namespace ReactorClient.Core
             throw new NotImplementedException();
         }
 
+        public void SendData(byte[] data)
+        {
+            lock (Socket)
+            {
+                Socket.Send(data);
+            }
+        }
+
         /// <summary>
         /// Send the request disconnect packet (alias: RequestMelt)
         /// </summary>
