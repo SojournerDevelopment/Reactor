@@ -20,6 +20,14 @@ namespace ReactorSecureClientExample
             client.TerminatingEvent += ClientOnTerminatingEvent;
             client.PacketReceivedEvent += ClientOnPacketReceivedEvent;
             client.Start(IPAddress.Parse("127.0.0.1"), 5555);
+
+            bool quit = false;
+
+            while (!quit)
+            {
+                Console.Write("");
+                string input = Console.ReadLine();
+            }
         }
 
         private static void ClientOnPacketReceivedEvent(byte[] data)

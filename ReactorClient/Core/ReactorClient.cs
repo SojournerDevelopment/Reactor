@@ -178,16 +178,67 @@ namespace ReactorClient.Core
 
                 while (Socket != null && Socket.Connected && !QuitThread)
                 {
-                    buffer = new byte[Socket.SendBufferSize];
-                    readBytes = Socket.Receive(buffer);
-                    byte[] packet = new byte[readBytes];
-                    Array.Copy(buffer,packet,readBytes);
+                    byte[] sizeinfo = new byte[4];
+                    //read the size of the message
+                    int totalread = 0, currentread = 0;
 
-                    if (readBytes > 0)
+                    currentread = totalread = Socket.Receive(sizeinfo);
+
+                    while (totalread < sizeinfo.Length && currentread > 0)
                     {
-                        HandlePacket(packet);
-                        PacketReceivedEvent?.Invoke(packet);
+                        currentread = Socket.Receive(sizeinfo,
+                            totalread, //offset into the buffer
+                            sizeinfo.Length - totalread, //max amount to read
+                            SocketFlags.None);
+                        totalread += currentread;
                     }
+
+                    int messagesize = 0;
+
+                    //could optionally call BitConverter.ToInt32(sizeinfo, 0);
+                    messagesize |= sizeinfo[0];
+                    messagesize |= (((int)sizeinfo[1]) << 8);
+                    messagesize |= (((int)sizeinfo[2]) << 16);
+                    messagesize |= (((int)sizeinfo[3]) << 24);
+
+                    //create a byte array of the correct size
+                    //note:  there really should be a size restriction on
+                    //              messagesize because a user could send
+                    //              Int32.MaxValue and cause an OutOfMemoryException
+                    //              on the receiving side.  maybe consider using a short instead
+                    //              or just limit the size to some reasonable value
+                    byte[] data = new byte[messagesize];
+
+                    //read the first chunk of data
+                    totalread = 0;
+                    currentread = totalread = Socket.Receive(data,
+                        totalread, //offset into the buffer
+                        data.Length - totalread, //max amount to read
+                        SocketFlags.None);
+
+                    //if we didn't get the entire message, read some more until we do
+                    while (totalread < messagesize && currentread > 0)
+                    {
+                        currentread = Socket.Receive(data,
+                            totalread, //offset into the buffer
+                            data.Length - totalread, //max amount to read
+                            SocketFlags.None);
+                        totalread += currentread;
+                    }
+
+                    HandlePacket(data);
+                    PacketReceivedEvent?.Invoke(data);
+
+                    // buffer = new byte[Socket.SendBufferSize];
+                    //readBytes = Socket.Receive(buffer);
+                    //byte[] packet = new byte[readBytes];
+                    //Array.Copy(buffer,packet,readBytes);
+
+                    //if (readBytes > 0)
+                    //{
+                    //    HandlePacket(packet);
+                    //    PacketReceivedEvent?.Invoke(packet);
+                    //}
                 }
             }
             catch (Exception ex)
@@ -208,10 +259,16 @@ namespace ReactorClient.Core
 
         public void SendData(byte[] data)
         {
-            lock (Socket)
-            {
-                Socket.Send(data);
-            }
+            byte[] sizeinfo = new byte[4];
+
+            // could optionally call BitConverter.GetBytes(data.length);
+            sizeinfo[0] = (byte)data.Length;
+            sizeinfo[1] = (byte)(data.Length >> 8);
+            sizeinfo[2] = (byte)(data.Length >> 16);
+            sizeinfo[3] = (byte)(data.Length >> 24);
+
+            Socket.Send(sizeinfo);
+            Socket.Send(data);
         }
 
         /// <summary>

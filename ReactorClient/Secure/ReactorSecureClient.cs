@@ -80,6 +80,7 @@ namespace ReactorClient.Secure
             JsonObject kvps = JsonObject.readFrom(decrypted);
             fusionKey = kvps.get("core").asString();
             fusionKeyClient = kvps.get("core-client").asString();
+            ConnectionSecured();
         }
 
         protected void HandleMelt(JsonObject o)
@@ -97,6 +98,8 @@ namespace ReactorClient.Secure
 
         }
 
+        protected virtual void ConnectionSecured() { }
+
         #endregion
 
 
@@ -104,8 +107,8 @@ namespace ReactorClient.Secure
 
         protected void SendAuth()
         {
-            this.SessionKey = Keygen.GetUniqueBytes(256);
-            this.SessionSalt = Keygen.GetUniqueBytes(128);
+            this.SessionKey = Encoding.Unicode.GetBytes(Keygen.GetUniqueKey(30));
+            this.SessionSalt = Encoding.Unicode.GetBytes(Keygen.GetUniqueKey(20));
 
             var session = Convert.ToBase64String(CryptoService.Encrypt(this.SessionKey,true));
             var salt = Convert.ToBase64String(CryptoService.Encrypt(this.SessionSalt, true));
