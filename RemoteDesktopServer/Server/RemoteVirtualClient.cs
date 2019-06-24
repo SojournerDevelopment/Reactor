@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ReactorServer.Secure;
 using ReactorServer.Utils.Json;
@@ -16,7 +18,7 @@ namespace RemoteDesktopServer.Server
         
         public RemoteVirtualClient(RemoteServer server) : base(server)
         {
-            
+            StartTimer();
         }
 
         protected override void SendSecurePacket(byte[] content)
@@ -24,31 +26,43 @@ namespace RemoteDesktopServer.Server
             base.SendSecurePacket(content);
         }
 
-        private int current = 0;
-        private int max = 0;
-        private List<byte[]> packets = new List<byte[]>();
+        public int frames = 0;
+        public string start = "";
+        public string end = "";
+
+        protected void StartTimer()
+        {
+            // Timer timer = new Timer(Tick,frames,0,1000);
+        }
+
+        protected void Tick(object info)
+        {
+            Debug.WriteLine("FPS: "+frames);
+            frames = 0;
+        }
 
         protected override void HandleSecurePacket(byte[] content)
         {
-            JsonObject o = JsonObject.readFrom(Encoding.Unicode.GetString(content));
-            current = o.get("current").asInt();
-            max = o.get("of").asInt();
-            packets.Add(Convert.FromBase64String(o.get("data").asString()));
-            if (current == max)
+            if (frames == 0)
             {
-                byte[] array = packets
-                    .SelectMany(a => a)
-                    .ToArray();
-                Bitmap b = ByteToBitmap(array);
-                RemoteServer rs = (RemoteServer)Server;
-                rs.mw.Dispatcher.Invoke(new Action((() =>
-                {
-                    rs.mw.SetRemoteDesktop(b);
-                })));
-                current = 0;
-                max = 0;
-                packets = new List<byte[]>();
+                start = DateTime.Now.ToString("HH:mm:ss.ffffff");
             }
+            frames++;
+            Bitmap b = ByteToBitmap(content);
+            RemoteServer rs = (RemoteServer)Server;
+            
+            rs.mw.Dispatcher.Invoke(new Action((() =>
+            {
+                rs.mw.SetRemoteDesktop(b);
+            })));
+
+            if (frames > 10)
+            {
+                end = DateTime.Now.ToString("HH:mm:ss.ffffff");
+                Debug.WriteLine("FPS: "+start+" END: "+end+" FRAMES: "+frames);
+                frames = 0;
+            }
+
         }
 
         public static byte[] ImageToByte2(Image img)

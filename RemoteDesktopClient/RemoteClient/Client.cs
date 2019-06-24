@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -27,24 +28,30 @@ namespace RemoteDesktopClient.RemoteClient
             captureThread.Start();
         }
 
+        public int frames = 0;
+        public string start = "";
+        public string end = "";
+
         private void RemoteDesktop()
         {
             Screenshot s = new Screenshot();
 
             while (capture)
             {
-                Bitmap b = s.WholeDesktop();
-                byte[] toSend = ImageToByte2(b);
-
-                List<byte[]> packets = ArraySplit(toSend, 5000);
-                for(int i = 0;i<packets.Count();i++)
+                if (frames == 0)
                 {
-                    JsonObject data = new JsonObject();
-                    data.set("current", i+1);
-                    data.set("of", packets.Count());
-                    data.set("data", Convert.ToBase64String(packets[i]));
-                    SendSecurePacket(Encoding.Unicode.GetBytes(data.ToString()));
+                    start = DateTime.Now.ToString("HH:mm:ss.ffffff");
                 }
+                Bitmap b = s.CaptureDesktop(false);
+                byte[] toSend = ImageToByte2(b);
+                frames++;
+                if (frames > 24)
+                {
+                    end = DateTime.Now.ToString("HH:mm:ss.ffffff");
+                    Debug.WriteLine("FPS: " + start + " END: " + end + " FRAMES: " + frames);
+                    frames = 0;
+                }
+                SendSecurePacket(toSend);
             }
         }
 
