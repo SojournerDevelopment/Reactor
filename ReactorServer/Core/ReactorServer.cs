@@ -131,6 +131,7 @@ namespace ReactorServer.Core
         {
             foreach (var client in Clients)
             {
+                DisconnectClient(client.Value);
                 ClientDisconnected(client.Value);
                 ClientDisconnectedEvent?.Invoke(client.Value);
             }

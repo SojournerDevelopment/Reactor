@@ -245,6 +245,8 @@ namespace ReactorClient.Core
                         data.Length - totalread, //max amount to read
                         SocketFlags.None);
 
+                    ReportPacketSize(messagesize,totalread);
+
                     //if we didn't get the entire message, read some more until we do
                     while (totalread < messagesize && currentread > 0)
                     {
@@ -253,6 +255,7 @@ namespace ReactorClient.Core
                             data.Length - totalread, //max amount to read
                             SocketFlags.None);
                         totalread += currentread;
+                        ReportPacketSize(messagesize,totalread);
                     }
 
                     HandlePacket(data);
@@ -275,6 +278,16 @@ namespace ReactorClient.Core
                 CrashedEvent?.Invoke();
                 Stop();
             }
+        }
+
+        /// <summary>
+        /// Reports the current received message size and corresponding updates to it.
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="current"></param>
+        public virtual void ReportPacketSize(int size, int current)
+        {
+            
         }
 
         /// <summary>

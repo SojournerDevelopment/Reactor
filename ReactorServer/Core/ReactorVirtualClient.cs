@@ -172,13 +172,15 @@ namespace ReactorServer.Core
                     //              on the receiving side.  maybe consider using a short instead
                     //              or just limit the size to some reasonable value
                     byte[] data = new byte[messagesize];
-
+                    
                     //read the first chunk of data
                     totalread = 0;
                     currentread = totalread = clientSocket.Receive(data,
                         totalread, //offset into the buffer
                         data.Length - totalread, //max amount to read
                         SocketFlags.None);
+
+                    client.ReportPacketSize(messagesize,totalread);
 
                     //if we didn't get the entire message, read some more until we do
                     while (totalread < messagesize && currentread > 0)
@@ -188,6 +190,7 @@ namespace ReactorServer.Core
                             data.Length - totalread, //max amount to read
                             SocketFlags.None);
                         totalread += currentread;
+                        client.ReportPacketSize(messagesize, totalread);
                     }
 
                     HandlePacket(data,client);
@@ -216,6 +219,16 @@ namespace ReactorServer.Core
         #endregion
 
         #region Implemented Methods
+
+        /// <summary>
+        /// Reports the received packet size and status
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="current"></param>
+        public virtual void ReportPacketSize(int size, int current)
+        {
+
+        }
 
         /// <summary>
         /// Handle new Packet received

@@ -67,6 +67,8 @@
     <Compile Include="Utils\Pem\PemTypes.cs" />
     <Compile Include="Utils\Pem\RSAParameterTraits.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
