@@ -46,14 +46,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleReactorServer.cs" />
+    <Compile Include="SimpleReactorVirtualClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Reactor\Reactor.csproj">
-      <Project>{0a3f1b33-b57a-46c9-8a11-c17a51e01595}</Project>
-      <Name>Reactor</Name>
+    <ProjectReference Include="..\ReactorServer\ReactorServer.csproj">
+      <Project>{793bedd3-f478-471b-9ba9-8ada8ab4d5f9}</Project>
+      <Name>ReactorServer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

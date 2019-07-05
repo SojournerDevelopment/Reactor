@@ -51,9 +51,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Reactor\Reactor.csproj">
-      <Project>{0a3f1b33-b57a-46c9-8a11-c17a51e01595}</Project>
-      <Name>Reactor</Name>
+    <ProjectReference Include="..\ReactorClient\ReactorClient.csproj">
+      <Project>{a187f00c-0fbb-4240-b590-7049aac2177a}</Project>
+      <Name>ReactorClient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

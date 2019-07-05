@@ -24,6 +24,8 @@ namespace ReactorServer.Core
 
     public abstract class ReactorServer
     {
+        private ManualResetEvent allDone = new ManualResetEvent(false);
+
         /// <summary>
         /// ID
         /// </summary>
@@ -54,6 +56,8 @@ namespace ReactorServer.Core
         /// </summary>
         protected Thread ServerSocketThread { get; set; }
 
+        //protected int NumberOfWorkerThreads = 15;
+
         #region Events
 
         public event ClientConnected ClientConnectedEvent;
@@ -69,7 +73,11 @@ namespace ReactorServer.Core
         /// <summary>
         /// Constructor of the server
         /// </summary>
-        protected ReactorServer() { }
+        protected ReactorServer()
+        {
+            // ThreadPool.SetMinThreads(4,Environment.ProcessorCount);
+            // ThreadPool.SetMaxThreads(NumberOfWorkerThreads, Environment.ProcessorCount);
+        }
 
         /// <summary>
         /// Start the server
@@ -156,7 +164,7 @@ namespace ReactorServer.Core
         /// <summary>
         /// Listener handler
         /// </summary>
-        public void HandleListen()
+        public async void HandleListen()
         {
             while (ServerSocket.IsBound && !_quitServerThread)
             {
@@ -169,10 +177,16 @@ namespace ReactorServer.Core
             }
         }
         
-        /// <summary>
-        /// Add custom clients via this method, simple return your own client class
-        /// </summary>
-        /// <returns></returns>
+        /*
+         *
+         * Methods for the Server
+         *
+         */
+
+            /// <summary>
+            /// Add custom clients via this method, simple return your own client class
+            /// </summary>
+            /// <returns></returns>
         protected virtual ReactorVirtualClient AcceptVirtualClient()
         {
             throw new NotImplementedException();

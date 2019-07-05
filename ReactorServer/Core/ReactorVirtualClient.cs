@@ -93,6 +93,10 @@ namespace ReactorServer.Core
             this.Id = GenerateId();
             this.SocketThread = new Thread(ReactorVirtualClient.HandleData);
             this.SocketThread.Start(this);
+
+            // Threadpool: (Currently disabled - Synchronous!)
+            // ThreadPool.QueueUserWorkItem(ReactorVirtualClient.HandleData, this);
+
             this.Address = (Socket.RemoteEndPoint as IPEndPoint)?.Address.ToString();
             SendRegistration();
         }
@@ -130,7 +134,7 @@ namespace ReactorServer.Core
         /// Handle data
         /// </summary>
         /// <param name="vc"></param>
-        public static void HandleData(object vc)
+        public static async void HandleData(object vc)
         {
             ReactorVirtualClient client = (ReactorVirtualClient)vc;
             Socket clientSocket = client.Socket;
@@ -155,6 +159,7 @@ namespace ReactorServer.Core
                             sizeinfo.Length - totalread, //max amount to read
                             SocketFlags.None);
                         totalread += currentread;
+                        // currentread = await clientSocket.BeginReceive(sizeinfo,totalread,sizeinfo.Length - totalread, SocketFlags.None);
                     }
 
                     int messagesize = 0;

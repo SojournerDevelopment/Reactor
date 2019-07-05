@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Reactor.Networking.Client;
 
 namespace SimpleClient
 {
@@ -13,7 +12,7 @@ namespace SimpleClient
     /// local host. After securing the connection, the client will send a Message
     /// with the current time to the server.
     /// </summary>
-    public class SimpleReactorClient : ReactorClient
+    public class SimpleReactorClient : ReactorClient.Core.ReactorClient
     {
 
         public SimpleReactorClient()
@@ -22,7 +21,13 @@ namespace SimpleClient
             base.DisconnectedEvent += OnDisconnectedEvent;
             base.CrashedEvent += OnCrashedEvent;
             base.PacketReceivedEvent += OnPacketReceivedEvent;
-            base.SecuredEvent += OnSecuredEvent;
+        }
+
+        public override void HandlePacket(byte[] data)
+        {
+            string packet = Encoding.Unicode.GetString(data);
+            SendData(Encoding.Unicode.GetBytes(DateTime.Now.ToString()));
+            //base.HandlePacket(data);
         }
 
         public void CrashHandle()
@@ -40,12 +45,13 @@ namespace SimpleClient
                 goto b;
             }
         }
+      
 
         private void OnSecuredEvent()
         {
             Console.WriteLine(DateTime.Now.ToString()+" | CLIENT =>    Connection Secured");
-            byte[] currentTime = Encoding.Unicode.GetBytes(DateTime.Now.ToString());
-            SendPacket(currentTime);
+            byte[] currentTime = Encoding.Unicode.GetBytes("TEST");
+            SendData(currentTime);
         }
 
         private void OnPacketReceivedEvent(byte[] data)
@@ -61,12 +67,12 @@ namespace SimpleClient
 
         private void OnDisconnectedEvent()
         {
-            Console.WriteLine(DateTime.Now.ToString() + " | CLIENT =>    Connection Secured");
+            // Console.WriteLine(DateTime.Now.ToString() + " | CLIENT =>    Connection Secured");
         }
 
         private void OnConnectedEvent()
         {
-            Console.WriteLine(DateTime.Now.ToString() + " | CLIENT =>    Connected to "+IdServer+"@"+address.ToString()+":"+port);
+            Console.WriteLine(DateTime.Now.ToString() + " | CLIENT =>    Connected to "+ServerId+"@"+Address.ToString()+":"+Port);
         }
     }
 }

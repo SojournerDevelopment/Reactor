@@ -3,58 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Reactor.Networking.Server;
+using ReactorServer.Core;
 
 namespace SimpleServer
 {
-    public class SimpleReactorServer
+    public class SimpleReactorServer : ReactorServer.Core.ReactorServer
     {
-        public SimpleReactorServer()
+
+        protected override void ClientCrashed(ReactorVirtualClient client)
         {
-            ReactorServer.ClientConnectedEvent += ReactorServerOnClientConnectedEvent;
-            ReactorServer.ClientDisconnectedEvent += ReactorServerOnClientDisconnectedEvent;
-            ReactorServer.ClientCrashedEvent += ReactorServerOnClientCrashedEvent;
-            ReactorServer.ClientConnectionSecuredEvent += ReactorServerOnClientConnectionSecuredEvent;
-            ReactorServer.ClientPacketReceivedEvent += ReactorServerOnClientPacketReceivedEvent;
+            Console.WriteLine("Client crashed: " + client.Id);
         }
 
-        public void Start()
+        protected override ReactorVirtualClient AcceptVirtualClient()
         {
-            ReactorServer.Start("127.0.0.1", 8172);
+            return new SimpleReactorVirtualClient(this);
         }
 
-        public void Stop()
+        protected override void ClientConnected(ReactorVirtualClient client)
         {
-            ReactorServer.StopGracefully();
+            Console.WriteLine("Client connected: "+client.Id);
         }
 
-
-        private void ReactorServerOnClientPacketReceivedEvent(ReactorVirtualClient c, byte[] data)
+        protected override void ClientDisconnected(ReactorVirtualClient client)
         {
-            // Received data from client
-            string time = Encoding.Unicode.GetString(data);
-            Console.WriteLine(DateTime.Now.ToString() + " | SERVER =>    Received:"+time);
+            Console.WriteLine("Client disconnected: "+client.Id);
         }
 
-        private void ReactorServerOnClientConnectionSecuredEvent(ReactorVirtualClient c)
-        {
-            Console.WriteLine(DateTime.Now.ToString() + " | SERVER =>    Connection secured to "+c.Address);
-        }
-
-        private void ReactorServerOnClientCrashedEvent(ReactorVirtualClient c)
-        {
-            Console.WriteLine(DateTime.Now.ToString() + " | SERVER =>    Client Crashed - Connection reset "+c.Id );
-        }
-
-        private void ReactorServerOnClientDisconnectedEvent(ReactorVirtualClient c)
-        {
-            Console.WriteLine(DateTime.Now.ToString() + " | SERVER =>    Client Disconnected - "+c.Id);
-        }
-
-        private void ReactorServerOnClientConnectedEvent(ReactorVirtualClient c)
-        {
-            Console.WriteLine(DateTime.Now.ToString() + " | SERVER =>    Client Connected - "+c.Id);
-        }
-        
     }
 }
