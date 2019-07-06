@@ -2,6 +2,11 @@
 
 ### Secure Server/Client Framework
 
+> **Warning:** Although this version of Reactor is based on modern infrastructure and processes data in real time, it is not designed for ultra high performance applications with thousands of clients.
+
+> **Reactor High Performance Edition**: A Version of the Reactor Framework, which allows you to create asynchronous socket event based high performance server/clients. Handle up to thousands of clients. [Sojourner Development](https://sojourner.dev)
+
+
 Reactor is a framework designed to enable the development of server and client applications that rely on reliability, performance and security.
 
 Reactor can also be used for IPC.
